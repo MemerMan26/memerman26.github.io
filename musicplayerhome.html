@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <style>
+        :root{
+            --bg: blue; /* blue */
+            --card: #ffffff;
+            --accent: #ffd400; /* yellow */
+            --muted: rgba(255,255,255,0.08);
+        }
+
+        html,body{height:100%;}
+        body {
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            color: var(--accent);
+            -webkit-font-smoothing:antialiased;
+        }
+
+        .container{
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1{
+            text-align:center;
+            margin: 8px 0 20px;
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
+
+        .games{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            align-items: start;
+        }
+
+        .game{
+            background: var(--card);
+            color: #000;
+            padding: 18px;
+            border-radius: 8px;
+            box-shadow: 0 6px 14px var(--muted);
+            text-align: center;
+        }
+
+        .game h2{margin: 10px 0 6px; font-size: 1.1rem;}
+        .game p{margin:0 0 12px; color:#333;}
+
+        .game button{
+            background: var(--accent);
+            border: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .game button:hover{opacity:0.95}
+
+        @media (max-width:480px){
+            body{padding:12px}
+            .game{padding:14px}
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Music Player</h1>
+
+        <div class="games">
+            <div class="game">
+                <div style="font-size: 2em;">🎵</div>
+                <h2>Undertale OST</h2>
+                <a href="undertalealbum.html"><button>Play</button></a>
+            </div>
+
+            <!-- Example placeholders (add more albums/pages as needed) -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>

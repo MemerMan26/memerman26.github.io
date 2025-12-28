@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Video Player</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#00d4ff}
+    body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:#e6f7ff}
+    .wrap{max-width:1000px;margin:28px auto;padding:18px}
+    h1{margin:0 0 12px;font-size:1.4rem;text-align:center}
+    .player{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:16px;border-radius:10px}
+    video{width:100%;height:auto;border-radius:6px;background:#000}
+    .controls{display:flex;gap:10px;align-items:center;margin-top:10px}
+    select,input[type=file]{padding:8px;border-radius:6px;border:1px solid #334155;background:#f8fafc}
+    button{padding:8px 12px;border-radius:6px;border:none;background:var(--accent);color:#001}
+    #dropZone{margin-top:12px;border:2px dashed #334155;border-radius:8px;padding:18px;text-align:center;color:#9fb6c9}
+    #dropZone.dragover{background:rgba(0,0,0,0.15);border-color:var(--accent);color:var(--accent)}
+    .muted{opacity:.85;font-size:.95rem}
+    @media (max-width:520px){.controls{flex-direction:column;align-items:stretch}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Video Player</h1>
+    <div class="player">
+      <video id="video" controls playsinline>
+        <!-- Source is set with JS -->
+        Your browser does not support the video element.
+      </video>
+
+      <div class="controls">
+        <label for="videoSelect" class="muted">Choose a file:</label>
+        <select id="videoSelect">
+          <option value="" selected disabled>— Select sample or load your own —</option>
+          <option value="videos/Caddicarus1.mp4">The Incredible World of Completing the Best Game of All Time-Caddicarus</option>
+          <option value="videos/Caddicarus2.mp4">Sample: sample2.webm</option>
+          <option value="videos/Caddicarus3.mp4">Sample: sample3.mp4</option>
+        </select>
+
+        <label class="muted">or</label>
+        <input id="fileInput" type="file" accept="video/*">
+
+        <button id="stopBtn">Stop</button>
+      </div>
+
+      <div id="dropZone">Drag & drop a video file here, or click the file input above.</div>
+    </div>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    const select = document.getElementById('videoSelect');
+    const fileInput = document.getElementById('fileInput');
+    const dropZone = document.getElementById('dropZone');
+    const stopBtn = document.getElementById('stopBtn');
+    let currentObjectUrl = null;
+
+    function setSource(src, autoplay = true){
+      // revoke previous object URL if any
+      if (currentObjectUrl){ URL.revokeObjectURL(currentObjectUrl); currentObjectUrl = null; }
+      video.src = src;
+      video.load();
+      if (autoplay) video.play().catch(()=>{});
+    }
+
+    select.addEventListener('change', e => {
+      const v = e.target.value;
+      if (!v) return;
+      setSource(v);
+    });
+
+    fileInput.addEventListener('change', e => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      currentObjectUrl = URL.createObjectURL(f);
+      setSource(currentObjectUrl);
+      // clear select so UI reflects local file
+      select.selectedIndex = 0;
+    });
+
+    // Drag & drop
+    ['dragenter','dragover'].forEach(ev => dropZone.addEventListener(ev, ev => { ev.preventDefault(); dropZone.classList.add('dragover'); }));
+    ['dragleave','drop'].forEach(ev => dropZone.addEventListener(ev, ev => { ev.preventDefault(); dropZone.classList.remove('dragover'); }));
+
+    dropZone.addEventListener('drop', e => {
+      const f = (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]);
+      if (!f) return;
+      currentObjectUrl = URL.createObjectURL(f);
+      setSource(currentObjectUrl);
+      fileInput.files = e.dataTransfer.files; // reflect file input
+      select.selectedIndex = 0;
+    });
+
+    stopBtn.addEventListener('click', ()=>{
+      video.pause();
+      video.currentTime = 0;
+      if (currentObjectUrl){ URL.revokeObjectURL(currentObjectUrl); currentObjectUrl = null; }
+      video.removeAttribute('src'); video.load();
+    });
+
+    // Optional: restore a chosen sample from URL param like ?src=videos/sample1.mp4
+    (function restoreFromParam(){
+      try{
+        const params = new URLSearchParams(location.search);
+        const src = params.get('src');
+        if (src){
+          // set matching select if present
+          for (let i=0;i<select.options.length;i++) if (select.options[i].value===src) select.selectedIndex = i;
+          setSource(src,false);
+        }
+      }catch(e){}
+    })();
+  </script>
+</body>
+</html>
